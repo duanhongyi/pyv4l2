@@ -22,7 +22,7 @@ setup(
         'Topic :: Software Development :: Libraries'
     ],
     author='duanhongyi',
-    author_email='dominik.pieczynski@gmail.com',
+    author_email='duanhongyi@doopai.com',
     url='https://github.com/duanhongyi/pyv4l2',
     license='GNU Lesser General Public License v3 (LGPLv3)',
     setup_requires=['setuptools_cython', 'Cython >= 0.18'],
