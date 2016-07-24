@@ -232,6 +232,10 @@ cdef class Camera:
 
         return frame_data[:buf_len]
 
+    @property
+    def fd(self):
+        return self.fd
+
     def close(self):
         xioctl(self.fd, VIDIOC_STREAMOFF, &self.buf.type)
 

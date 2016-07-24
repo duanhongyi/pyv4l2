@@ -9,6 +9,31 @@ from setuptools.extension import Extension
 from pyv4l2 import __version__
 
 
+try:
+    sys.argv.remove('--use-cython')
+    USE_CYTHON = True
+except ValueError:
+    USE_CYTHON = False
+
+
+extension_name = 'pyx' if USE_CYTHON else 'c'
+extensions = [
+    Extension(
+        'pyv4l2/camera',
+        ["pyv4l2/camera.%s" % extension_name],
+        libraries=["v4l2", ]
+    ),
+    Extension(
+        'pyv4l2/controls',
+        ["pyv4l2/controls.%s" % extension_name],
+        libraries=["v4l2", ]
+    )
+]
+
+if USE_CYTHON:
+    from Cython.Build import cythonize
+    extensions = cythonize(extensions)
+
 setup(
     name='pyv4l2',
     version=__version__,
@@ -30,16 +55,5 @@ setup(
         'examples': ['pillow', 'numpy'],
     },
     packages=find_packages(),
-    ext_modules=[
-        Extension(
-            'pyv4l2/camera',
-            ["pyv4l2/camera.pyx"],
-            libraries=["v4l2", ]
-        ),
-        Extension(
-            'pyv4l2/controls',
-            ["pyv4l2/controls.pyx"],
-            libraries=["v4l2", ]
-        )
-    ]
+    ext_modules=extensions,
 )
