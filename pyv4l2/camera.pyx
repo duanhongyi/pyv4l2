@@ -1,7 +1,7 @@
 from v4l2 cimport *
 from libc.errno cimport errno, EINTR, EINVAL
 from libc.string cimport memset, memcpy, strerror
-from libc.stdlib cimport malloc, calloc
+from libc.stdlib cimport malloc, calloc, free
 from posix.select cimport fd_set, timeval, FD_ZERO, FD_SET, select
 from posix.fcntl cimport O_RDWR
 from posix.mman cimport PROT_READ, PROT_WRITE, MAP_SHARED
@@ -229,8 +229,10 @@ cdef class Camera:
 
         if -1 == xioctl(self.fd, VIDIOC_QBUF, &self.buf):
             raise CameraError('Exchanging buffer with device failed')
-
-        return frame_data[:buf_len]
+        try:
+            return frame_data[:buf_len]
+        finally:
+            free(frame_data)
 
     @property
     def fd(self):
