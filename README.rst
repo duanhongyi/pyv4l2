@@ -55,10 +55,3 @@ Usage
 
     camera = Camera('/dev/video0')
     frame = camera.get_frame()
-
-The returned frame is of bytes type and contains pixels packed using RGB24
-format. To learn more see `V4L2_PIX_FMT_RGB24 description
-<https://linuxtv.org/downloads/v4l-dvb-apis/packed-rgb.html>`_.
-
-Example of frames to numpy arrays conversion can be found in the examples
-directory.

@@ -37,7 +37,7 @@ if USE_CYTHON:
 setup(
     name='pyv4l2',
     version=__version__,
-    description='Simple, libv4l2 based frame grabber',
+    description='Simple v4l2 for pyv4l2',
     classifiers=[
         'Intended Audience :: Developers',
         'License :: OSI Approved :: BSD License',
