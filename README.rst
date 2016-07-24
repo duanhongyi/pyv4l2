@@ -1,7 +1,10 @@
 ************
-PyV4L2Camera
+pyv4l2
 ************
 A simple, libv4l2-based frames capture library.
+The `pyv4l2` module based PyV4L2Camera development,
+I removed the v4lconvert_convert part of the code, the most original data to return the device.
+PyV4L2Camera module in `https://gitlab.com/radish/PyV4L2Camera` ,Thank you `Dominik Pieczyński`.
 
 ============
 Installation
@@ -33,22 +36,22 @@ Arch Linux
     # pacman -S v4l-utils
 
 ++++++
-PyV4L2
+pyv4l2
 ++++++
-To install PyV4L2Camera make sure you have Cython installed and type:
+To install pyv4l2:
 
 .. code-block:: bash
 
-    $ pip install PyV4L2Camera
+    $ pip install pyv4l2
 
-PyV4L2Camera is only compatible with Python 3.
+pyv4l2 is only compatible with Python 3.
 
 =====
 Usage
 =====
 .. code-block:: python
 
-    from PyV4L2Camera.camera import Camera
+    from pyv4l2.camera import Camera
 
     camera = Camera('/dev/video0')
     frame = camera.get_frame()
@@ -59,14 +62,3 @@ format. To learn more see `V4L2_PIX_FMT_RGB24 description
 
 Example of frames to numpy arrays conversion can be found in the examples
 directory.
-
-=============
-Contributions
-=============
-Contributions are always welcome!
-
-=======
-Authors
-=======
-`Dominik Pieczyński <https://gitlab.com/u/rivi>`_ and `contributors
-<https://gitlab.com/radish/PyV4L2Camera/graphs/master/contributors>`_.
