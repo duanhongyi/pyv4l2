@@ -225,11 +225,10 @@ cdef class Camera:
         buf_len = self.buf.bytesused
 
         frame_data = <unsigned char *>malloc(buf_len * sizeof(char))
-        memcpy(frame_data, buf, buf_len)
-
-        if -1 == xioctl(self.fd, VIDIOC_QBUF, &self.buf):
-            raise CameraError('Exchanging buffer with device failed')
         try:
+            memcpy(frame_data, buf, buf_len)
+            if -1 == xioctl(self.fd, VIDIOC_QBUF, &self.buf):
+                raise CameraError('Exchanging buffer with device failed')
             return frame_data[:buf_len]
         finally:
             free(frame_data)
