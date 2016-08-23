@@ -51,7 +51,11 @@ Usage
 =====
 .. code-block:: python
 
-    from pyv4l2.camera import Camera
+    from pyv4l2.frame import Frame
+    from pyv4l2.control import Control
 
-    camera = Camera('/dev/video0')
-    frame = camera.get_frame()
+    frame = Frame('/dev/video0')
+    frame_data = frame.get_frame()
+    control = Control("/dev/video0")
+    control.get_control_value(9963776)
+    control.set_control_value(9963776, 8)
