@@ -19,13 +19,13 @@ except ValueError:
 extension_name = 'pyx' if USE_CYTHON else 'c'
 extensions = [
     Extension(
-        'pyv4l2/camera',
-        ["pyv4l2/camera.%s" % extension_name],
+        'pyv4l2/frame',
+        ["pyv4l2/frame.%s" % extension_name],
         libraries=["v4l2", ]
     ),
     Extension(
-        'pyv4l2/controls',
-        ["pyv4l2/controls.%s" % extension_name],
+        'pyv4l2/control',
+        ["pyv4l2/control.%s" % extension_name],
         libraries=["v4l2", ]
     )
 ]
