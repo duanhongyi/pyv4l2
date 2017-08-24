@@ -1,47 +1,14 @@
 from v4l2 cimport *
 from libc.errno cimport errno, EINVAL
 from libc.string cimport memset
+from typing import Any, List
 from posix.fcntl cimport O_RDWR
 
 from .exceptions import CameraError
 
 
-from enum import Enum
-
-class ControlIDs(Enum):
-    BRIGHTNESS = V4L2_CID_BRIGHTNESS
-    CONTRAST = V4L2_CID_CONTRAST
-    SATURATION = V4L2_CID_SATURATION
-    HUE = V4L2_CID_HUE
-    AUDIO_VOLUME = V4L2_CID_AUDIO_VOLUME
-    AUDIO_BALANCE = V4L2_CID_AUDIO_BALANCE
-    AUDIO_BASS = V4L2_CID_AUDIO_BASS
-    AUDIO_TREBLE = V4L2_CID_AUDIO_TREBLE
-    AUDIO_MUTE = V4L2_CID_AUDIO_MUTE
-    AUDIO_LOUDNESS = V4L2_CID_AUDIO_LOUDNESS
-    BLACK_LEVEL = V4L2_CID_BLACK_LEVEL
-    AUTO_WHITE_BALANCE = V4L2_CID_AUTO_WHITE_BALANCE
-    DO_WHITE_BALANCE = V4L2_CID_DO_WHITE_BALANCE
-    RED_BALANCE = V4L2_CID_RED_BALANCE
-    BLUE_BALANCE = V4L2_CID_BLUE_BALANCE
-    GAMMA = V4L2_CID_GAMMA
-    WHITENESS = V4L2_CID_WHITENESS
-    EXPOSURE = V4L2_CID_EXPOSURE
-    AUTOGAIN = V4L2_CID_AUTOGAIN
-    GAIN = V4L2_CID_GAIN
-    HFLIP = V4L2_CID_HFLIP
-    VFLIP = V4L2_CID_VFLIP
-    POWER_LINE_FREQUENCY = V4L2_CID_POWER_LINE_FREQUENCY
-    HUE_AUTO = V4L2_CID_HUE_AUTO
-    WHITE_BALANCE_TEMPERATURE = V4L2_CID_WHITE_BALANCE_TEMPERATURE
-    SHARPNESS = V4L2_CID_SHARPNESS
-    BACKLIGHT_COMPENSATION = V4L2_CID_BACKLIGHT_COMPENSATION
-    CHROMA_AGC = V4L2_CID_CHROMA_AGC
-    COLOR_KILLER = V4L2_CID_COLOR_KILLER
-    COLORFX = V4L2_CID_COLORFX
-
-
 cdef class Control:
+
     cdef int fd
 
     def __cinit__(self, device_path):
@@ -50,6 +17,53 @@ cdef class Control:
         self.fd = v4l2_open(device_path, O_RDWR)
         if -1 == self.fd:
             raise CameraError('Error opening device {}'.format(device_path))
+
+    cdef enumerate_menu(self, v4l2_queryctrl queryctrl):
+        cdef v4l2_querymenu querymenu
+        querymenu.id = queryctrl.id
+        querymenu.index = queryctrl.minimum
+        menu = {}
+        while querymenu.index <= queryctrl.maximum:
+            if 0 == xioctl(self.fd, VIDIOC_QUERYMENU, & querymenu):
+                menu[querymenu.name] = querymenu.index
+            querymenu.index += 1
+        return menu
+
+    def get_controls(self):
+        cdef v4l2_queryctrl queryctrl
+        queryctrl.id = V4L2_CTRL_CLASS_USER | V4L2_CTRL_FLAG_NEXT_CTRL
+        controls = []
+        control_type = {
+            V4L2_CTRL_TYPE_INTEGER: 'int',
+            V4L2_CTRL_TYPE_BOOLEAN: 'bool',
+            V4L2_CTRL_TYPE_MENU: 'menu'
+        }
+ 
+        while (0 == xioctl(self.fd, VIDIOC_QUERYCTRL, & queryctrl)):
+            control = {}  
+            control['name'] = queryctrl.name
+            control['type'] = control_type[queryctrl.type]
+            control['id'] = queryctrl.id
+            control['min'] = queryctrl.minimum
+            control['max'] = queryctrl.maximum
+            control['step'] = queryctrl.step
+            control['default'] = queryctrl.default_value
+            control['value'] = self.get_control_value(queryctrl.id)
+            if queryctrl.flags & V4L2_CTRL_FLAG_DISABLED:
+                control['disabled'] = True
+            else:
+                control['disabled'] = False
+ 
+                if queryctrl.type == V4L2_CTRL_TYPE_MENU:
+                    control['menu'] = self.enumerate_menu(queryctrl)
+ 
+            controls.append(control)
+ 
+            queryctrl.id |= V4L2_CTRL_FLAG_NEXT_CTRL
+ 
+        if errno != EINVAL:
+            raise CameraError('Querying controls failed')
+        return controls
 
     cpdef void set_control_value(self, control_id, value):
         cdef v4l2_queryctrl queryctrl
