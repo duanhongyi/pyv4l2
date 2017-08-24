@@ -57,5 +57,6 @@ Usage
     frame = Frame('/dev/video0')
     frame_data = frame.get_frame()
     control = Control("/dev/video0")
+    control.get_controls()
     control.get_control_value(9963776)
     control.set_control_value(9963776, 8)
