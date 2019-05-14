@@ -19,12 +19,12 @@ except ValueError:
 extension_name = 'pyx' if USE_CYTHON else 'c'
 extensions = [
     Extension(
-        'pyv4l2/frame',
+        'pyv4l2.frame',
         ["pyv4l2/frame.%s" % extension_name],
         libraries=["v4l2", ]
     ),
     Extension(
-        'pyv4l2/control',
+        'pyv4l2.control',
         ["pyv4l2/control.%s" % extension_name],
         libraries=["v4l2", ]
     )
@@ -50,7 +50,7 @@ setup(
     author_email='duanhongyi@doopai.com',
     url='https://github.com/duanhongyi/pyv4l2',
     license='GNU Lesser General Public License v3 (LGPLv3)',
-    setup_requires=['setuptools_cython', 'Cython >= 0.18'],
+    setup_requires=['Cython >= 0.18', ],
     extras_require={
         'examples': ['pillow', 'numpy'],
     },
